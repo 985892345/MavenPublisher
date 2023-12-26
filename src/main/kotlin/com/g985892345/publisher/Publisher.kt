@@ -93,8 +93,8 @@ abstract class Publisher(val project: Project) {
     tags: List<String>
   ) {
     project.extensions.configure<GradlePluginDevelopmentExtension> {
-      website.set("https://github.com/985892345/${githubRepositoryName}")
-      vcsUrl.set("https://github.com/985892345/${githubRepositoryName}")
+      website.set("https://github.com/${githubName}/${githubRepositoryName}")
+      vcsUrl.set("https://github.com/${githubName}/${githubRepositoryName}")
       plugins {
         create(id) {
           this.id = id

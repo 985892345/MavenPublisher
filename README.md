@@ -1,6 +1,6 @@
 # MavenPublisher
-![Maven Central](https://img.shields.io/maven-central/v/io.github.985892345/MavenPublisher?server=https://s01.oss.sonatype.org&label=MavenPublisher)
-![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/io.github.985892345/MavenPublisher?server=https://s01.oss.sonatype.org&label=MavenPublisher-SNAPSHOT)
+![Maven Central](https://img.shields.io/maven-central/v/io.github.985892345/MavenPublisher?server=https://s01.oss.sonatype.org&label=release)
+![Sonatype Nexus (Snapshots)](https://img.shields.io/nexus/s/io.github.985892345/MavenPublisher?server=https://s01.oss.sonatype.org&label=SNAPSHOT)
 
 一个一键发布 github 开源库到 mavenCentral 的 gradle 插件
 
