@@ -2,7 +2,6 @@ package com.g985892345.publisher
 
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.logging.LogLevel
 import org.gradle.api.publish.PublishingExtension
 import org.gradle.api.publish.maven.MavenPublication
 import org.gradle.kotlin.dsl.apply
@@ -25,23 +24,24 @@ class MavenPublisherExtension : Plugin<Project> {
   private fun Project.config() {
     apply(plugin = "org.gradle.maven-publish")
     apply(plugin = "org.gradle.signing")
-    val publish = extensions.create("publisher", Publisher::class.java, project)
-    publish.publicationConfig.config(project)
+    val publisher = extensions.create("publisher", Publisher::class.java, project)
+    publisher.publicationConfig.config(project)
     // 使用 afterEvaluate 确保 publish 已被设置
     afterEvaluate {
       extensions.configure<PublishingExtension> {
         publications {
-          val projectArtifactId = publish.artifactId
-          val projectGroupId = publish.groupId ?: error("未设置 groupId")
-          val projectVersion = publish.version ?: error("未设置 version")
-          val projectGithubName = publish.githubName
-          val projectDescription = publish.description
-          val projectMainBranch = publish.mainBranch
+          val projectGithubName = publisher.githubName
+          val projectArtifactId = publisher.artifactId
+          val projectGroupId = publisher.groupId
+          val projectVersion = publisher.version ?: error("未设置 version, 请在 build.gradle.kts 中设置 version 或单独设置 publisher.version")
+          val projectGithubRepositoryName = publisher.githubRepositoryName
+          val projectDescription = publisher.description
+          val projectMainBranch = publisher.mainBranch
           create<MavenPublication>("MavenCentral") {
             artifactId = projectArtifactId
             groupId = projectGroupId
             version = projectVersion
-            publish.publicationConfig.apply { configMaven(project) }
+            publisher.publicationConfig.apply { configMaven(project) }
             extensions.configure<SigningExtension> {
               sign(this@create)
             }
@@ -49,27 +49,28 @@ class MavenPublisherExtension : Plugin<Project> {
             pom {
               name.set(projectArtifactId)
               description.set(projectDescription)
-              url.set("https://github.com/985892345/$projectGithubName")
+              url.set("https://github.com/$projectGithubName/$projectGithubRepositoryName")
 
               licenses {
                 license {
-                  name.set(publish.license ?: error("未提供 License"))
-                  url.set("https://github.com/985892345/$projectGithubName/blob/$projectMainBranch/LICENSE")
+                  name.set(publisher.license ?: error("未提供 License, 请在 build.gradle.kts 中设置 publisher.license = \"XXX\""))
+                  url.set("https://github.com/$projectGithubName/$projectGithubRepositoryName/blob/$projectMainBranch/LICENSE")
                 }
               }
 
               developers {
                 developer {
-                  id.set("985892345")
-                  name.set("GuoXiangrui")
-                  email.set("guo985892345@formail.com")
+                  publisher.masterDeveloper.config(this)
+                }
+                publisher.otherDevelopers.forEach {
+                  developer { it.config(this) }
                 }
               }
 
               scm {
-                connection.set("https://github.com/985892345/$projectGithubName.git")
-                developerConnection.set("https://github.com/985892345/$projectGithubName.git")
-                url.set("https://github.com/985892345/$projectGithubName")
+                connection.set("https://github.com/$projectGithubName/$projectGithubRepositoryName.git")
+                developerConnection.set("https://github.com/$projectGithubName/$projectGithubRepositoryName.git")
+                url.set("https://github.com/$projectGithubName/$projectGithubRepositoryName")
               }
             }
           }
@@ -89,11 +90,7 @@ class MavenPublisherExtension : Plugin<Project> {
           }
         }
       }
-
-      tasks.create("publishToMavenCentral") {
-        group = "publishing"
-        dependsOn(tasks.getByName("publishAllPublicationsToMavenCentralRepository"))
-      }
+      publisher.publicationConfig.afterConfigMaven(project)
     }
   }
 }

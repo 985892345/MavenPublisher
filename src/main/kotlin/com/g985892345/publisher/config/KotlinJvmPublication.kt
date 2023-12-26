@@ -1,0 +1,25 @@
+package com.g985892345.publisher.config
+
+import com.g985892345.publisher.MavenPublicationConfig
+import com.g985892345.publisher.configJarTask
+import org.gradle.api.Project
+import org.gradle.api.publish.maven.MavenPublication
+import org.gradle.kotlin.dsl.get
+
+/**
+ * .
+ *
+ * @author 985892345
+ * 2023/12/26 16:49
+ */
+object KotlinJvmPublication : MavenPublicationConfig {
+  override fun config(project: Project) {
+    configJarTask(project)
+  }
+
+  override fun MavenPublication.configMaven(project: Project) {
+    artifact(project.tasks["javadocJar"])
+    artifact(project.tasks["sourcesJar"])
+    from(project.components["kotlin"])
+  }
+}

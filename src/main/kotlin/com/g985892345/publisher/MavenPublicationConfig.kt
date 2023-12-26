@@ -15,68 +15,20 @@ import org.gradle.kotlin.dsl.get
 interface MavenPublicationConfig {
   fun config(project: Project) {}
   fun MavenPublication.configMaven(project: Project)
-
-  object Android : MavenPublicationConfig {
-    override fun config(project: Project) {
-      val android = project.extensions.getByName("android")
-      val publishing = android.javaClass.getMethod("getPublishing").invoke(android)
-      publishing.javaClass.getMethod("singleVariant", String::class.java, Function1::class.java)
-        .invoke(publishing, "release", object : Function1<Any, Unit> {
-          override fun invoke(p1: Any) {
-            p1.javaClass.getMethod("withJavadocJar").invoke(p1)
-            p1.javaClass.getMethod("withSourcesJar").invoke(p1)
-          }
-        })
-      /**
-       * 实现：
-       * android {
-       *   publishing {
-       *     singleVariant("release") {
-       *       withJavadocJar()
-       *       withSourcesJar()
-       *     }
-       *   }
-       * }
-       */
+  fun afterConfigMaven(project: Project) {
+    project.tasks.register("toMavenCentral") {
+      group = "maven publisher"
+      dependsOn("publishMavenCentralPublicationToMavenCentralRepository")
     }
 
-    override fun MavenPublication.configMaven(project: Project) {
-      from(project.components["release"])
-    }
-  }
-
-  object Java : MavenPublicationConfig {
-    override fun config(project: Project) {
-      configJvmTask(project)
-    }
-
-    override fun MavenPublication.configMaven(project: Project) {
-      artifact(project.tasks["javadocJar"])
-      artifact(project.tasks["sourcesJar"])
-      from(project.components["java"])
-    }
-  }
-
-  object KotlinJvm : MavenPublicationConfig {
-    override fun config(project: Project) {
-      configJvmTask(project)
-    }
-
-    override fun MavenPublication.configMaven(project: Project) {
-      artifact(project.tasks["javadocJar"])
-      artifact(project.tasks["sourcesJar"])
-      from(project.components["kotlin"])
-    }
-  }
-
-  object KotlinMultiplatform : MavenPublicationConfig {
-    override fun MavenPublication.configMaven(project: Project) {
-      from(project.components["kotlin"])
+    project.tasks.register("toMavenLocal") {
+      group = "maven publisher"
+      dependsOn("publishMavenCentralPublicationToMavenLocal")
     }
   }
 }
 
-private fun configJvmTask(project: Project) {
+internal fun configJarTask(project: Project) {
   project.tasks.register("javadocJar", Jar::class.java) {
     archiveClassifier.set("javadoc")
     from("javadoc")
