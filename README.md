@@ -25,7 +25,7 @@ plugins {
 - org.jetbrains.kotlin.jvm
 - java
 
-相关配置更多可以查看 [Publisher](./src/main/kotlin/com/g985892345/publisher/Publisher.kt) 类代码
+相关配置更多可以查看 [Publisher](./src/main/kotlin/com/g985892345/publisher/Publisher.kt) 类代码注释
 ```kotlin
 // build.gradle.kts 中
 publisher {

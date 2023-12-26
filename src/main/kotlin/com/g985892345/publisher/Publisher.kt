@@ -61,7 +61,7 @@ abstract class Publisher(val project: Project) {
    * 3. 还是没得就会报错
    */
   var version: String? = null
-    get() = if (field.isNullOrEmpty()) field else {
+    get() = if (!field.isNullOrEmpty()) field else {
       project.version.toString().takeIf { it != Project.DEFAULT_VERSION }
         ?: project.properties["VERSION"]?.toString()
     }
