@@ -4,11 +4,8 @@
 
 一个一键发布 github 开源库到 mavenCentral 的 gradle 插件
 
-支持如下项目的发布：
-- Android
-- Java
-- Kotlin/Jvm
-- gradle plugin
+基于 [com.vanniktech.maven.publish](https://github.com/vanniktech/gradle-maven-publish-plugin) 定制，
+简化操作 (感谢 com.vanniktech.maven.publish)
 
 ## 使用
 build.gradle.kts 引入以下插件:
@@ -17,11 +14,6 @@ plugins {
   id("io.github.985892345.MavenPublisher") version "x.y.z"
 }
 ```
-注意该插件需要在以下插件后引入，否则将无法判断模块类型:
-- com.android.library
-- com.gradle.plugin-publish
-- org.jetbrains.kotlin.jvm
-- java
 
 相关配置更多可以查看 [Publisher](./src/main/kotlin/com/g985892345/publisher/Publisher.kt) 类代码注释
 ```kotlin
@@ -31,6 +23,7 @@ publisher {
   license = "MIT"
   description = "一键发布 985892345 的开源库到 mavenCentral"
   createGradlePlugin( // 只有 gradle 插件才需要
+    name = "MavenPublisher",
     id = "io.github.985892345.MavenPublisher",
     implementationClass = "com.g985892345.publisher.MavenPublisherExtension",
     displayName = "Maven 发布插件",
@@ -41,12 +34,18 @@ publisher {
 
 最后运行以下命令即可发布:
 ```shell
-# 发布到 mavenCentral，如果 version 以 SNAPSHOT 结尾，则发布到 mavenCentral 的快照仓库
-./gradlew toMavenCentral
-
 # 发布到本地仓库
-./gradlew toMavenLocal
+./gradlew publishToMavenLocal
+
+# 如果 version 以 SNAPSHOT 结尾，发布到 mavenCentral 的快照仓库
+./gradlew publishAllPublicationsToMavenCentralRepository
+
+# 发布到 release 
+# 可以直接使用 publishAllPublicationsToMavenCentralRepositoryNoConfigurationCache 任务，已带上参数
+./gradlew publishAllPublicationsToMavenCentralRepository --no-configuration-cache
+./gradlew closeAndReleaseRepository
 ```
+详细步骤可以查看 [com.vanniktech.maven.publish Publishing release](https://vanniktech.github.io/gradle-maven-publish-plugin/central/#publishing-releases)
 
 <details>
 <summary>mavenCentral 快照仓库配置</summary>
@@ -84,8 +83,7 @@ repositories {
 </details>
 
 ## 注
-本插件只支持 github 发布 mavenCentral 的配置，其他非 github 仓库虽未支持，
-但可以参考该项目进行修改，只需简单改下 url 即可
+本插件只支持 github 发布 mavenCentral 的配置
 
 如果你还未拥有自己的 mavenCentral 仓库，可以查看以下教程：
 - [Android库发布到Maven Central超详细攻略](https://juejin.cn/post/7044831526671876110)
@@ -94,3 +92,9 @@ repositories {
 - [2022年1月最新实践将依赖上传Maven中央仓库](https://blog.csdn.net/slipperySoap/article/details/122732707?utm_medium=distribute.pc_aggpage_search_result.none-task-blog-2~aggregatepage~first_rank_ecpm_v1~rank_v31_ecpm-1-122732707-null-null.pc_agg_new_rank&utm_term=%E7%94%B3%E8%AF%B7maven%E4%BB%93%E5%BA%93&spm=1000.2123.3001.4430)
 
 **你只需要注册 maven 账号并且创建好密钥即可使用该插件**
+
+## 报错
+因为单独用代码设置的 groupId，所以在 gradle.properties 设置 GROUP 时会报以下异常，取消 GROUP 即可
+```
+The value for extension 'mavenPublishing' property 'groupId$plugin' is final and cannot be changed any further.
+```

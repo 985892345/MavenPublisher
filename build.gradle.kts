@@ -1,11 +1,10 @@
 plugins {
   `kotlin-dsl`
-  id("com.gradle.plugin-publish") version "1.2.1" // https://plugins.gradle.org/docs/publish-plugin
-  id("io.github.985892345.MavenPublisher") version "1.0.0-alpha27-SNAPSHOT"
+  id("io.github.985892345.MavenPublisher") version "1.1.0"
 }
 
 group = "io.github.985892345"
-version = "1.0.0-alpha27-SNAPSHOT"
+version = "1.1.0"
 
 repositories {
   mavenLocal()
@@ -14,10 +13,15 @@ repositories {
   mavenCentral()
 }
 
+dependencies {
+  implementation("com.vanniktech:gradle-maven-publish-plugin:0.26.0")
+}
+
 publisher {
-  license = "MIT"
+  license = "MIT License"
   description = "一键发布 985892345 的开源库到 mavenCentral"
   createGradlePlugin(
+    name = "MavenPublisher",
     id = "io.github.985892345.MavenPublisher",
     implementationClass = "com.g985892345.publisher.MavenPublisherExtension",
     displayName = "Maven 发布插件",

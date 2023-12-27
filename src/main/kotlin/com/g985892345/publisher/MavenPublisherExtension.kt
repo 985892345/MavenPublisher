@@ -1,13 +1,14 @@
 package com.g985892345.publisher
 
+import com.vanniktech.maven.publish.MavenPublishBaseExtension
+import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.api.Plugin
 import org.gradle.api.Project
-import org.gradle.api.publish.PublishingExtension
 import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 
 /**
- * 一键发布到 mavenControl 仓库，自动判断 Android 、Kotlin、Java 平台
+ * 基于 com.vanniktech.maven.publish 插件定制 github 一键发布到 mavenControl 仓库
  *
  * @author 985892345
  * 2023/12/25 21:27
@@ -19,29 +20,57 @@ class MavenPublisherExtension : Plugin<Project> {
   }
 
   private fun Project.config() {
-    apply(plugin = "org.gradle.maven-publish")
-    apply(plugin = "org.gradle.signing")
+    apply(plugin = "com.vanniktech.maven.publish")
+    tasks.register("publishAllPublicationsToMavenCentralRepositoryNoConfigurationCache") {
+      group = "publishing"
+      doLast {
+        val args = listOf(
+          "publishAllPublicationsToMavenCentralRepository",
+          "--no-configuration-cache"
+        )
+
+        exec {
+          commandLine("gradlew", *args.toTypedArray())
+        }
+      }
+    }
     val publisher = extensions.create("publisher", Publisher::class.java, project)
-    publisher.publicationConfig.config(project)
     // 使用 afterEvaluate 确保 publish 已被设置
     afterEvaluate {
-      extensions.configure<PublishingExtension> {
-        repositories {
-          maven {
-            // https://s01.oss.sonatype.org/
-            name = "mavenCentral"
-            val releasesRepoUrl = "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/"
-            val snapshotsRepoUrl = "https://s01.oss.sonatype.org/content/repositories/snapshots/"
-            val isSnapshot = publisher.version.endsWith("SNAPSHOT")
-            setUrl(if (isSnapshot) snapshotsRepoUrl else releasesRepoUrl)
-            credentials {
-              username = project.properties["mavenCentralUsername"].toString()
-              password = project.properties["mavenCentralPassword"].toString()
+      extensions.configure<MavenPublishBaseExtension> {
+        coordinates(publisher.groupId, publisher.artifactId, publisher.version)
+        signAllPublications()
+        publishToMavenCentral(SonatypeHost.S01)
+        pom {
+          name.set(publisher.artifactId)
+          description.set(publisher.description)
+          url.set("https://github.com/${publisher.githubName}/${publisher.githubRepositoryName}")
+
+          publisher.license?.let {
+            licenses {
+              license {
+                name.set(it)
+                url.set("https://github.com/${publisher.githubName}/${publisher.githubRepositoryName}/blob/${publisher.mainBranch}/LICENSE")
+              }
             }
+          }
+
+          developers {
+            developer {
+              publisher.masterDeveloper.config(this)
+            }
+            publisher.otherDevelopers.forEach {
+              developer { it.config(this) }
+            }
+          }
+
+          scm {
+            url.set("https://github.com/${publisher.githubName}/${publisher.githubRepositoryName}")
+            connection.set("scm:git:git:https://github.com/${publisher.githubName}/${publisher.githubRepositoryName}.git")
+            developerConnection.set("scm:git:ssh:https://github.com/${publisher.githubName}/${publisher.githubRepositoryName}.git")
           }
         }
       }
     }
-    publisher.publicationConfig.afterConfigMaven(project)
   }
 }
