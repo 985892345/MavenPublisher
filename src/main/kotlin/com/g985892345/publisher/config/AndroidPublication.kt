@@ -13,6 +13,7 @@ import org.gradle.kotlin.dsl.get
  */
 object AndroidPublication : MavenPublicationConfig {
   override fun config(project: Project) {
+    super.config(project)
     val android = project.extensions.getByName("android")
     val publishing = android.javaClass.getMethod("getPublishing").invoke(android)
     publishing.javaClass.getMethod("singleVariant", String::class.java, Function1::class.java)

@@ -1,11 +1,11 @@
 plugins {
   `kotlin-dsl`
   id("com.gradle.plugin-publish") version "1.2.1" // https://plugins.gradle.org/docs/publish-plugin
-  id("io.github.985892345.MavenPublisher") version "1.0.0-alpha23-SNAPSHOT"
+  id("io.github.985892345.MavenPublisher") version "1.0.0-alpha27-SNAPSHOT"
 }
 
 group = "io.github.985892345"
-version = "1.0.0-alpha23-SNAPSHOT"
+version = "1.0.0-alpha27-SNAPSHOT"
 
 repositories {
   mavenLocal()

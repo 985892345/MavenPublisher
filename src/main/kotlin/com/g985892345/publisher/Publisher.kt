@@ -17,9 +17,8 @@ abstract class Publisher(val project: Project) {
 
   // 主开发者信息
   var masterDeveloper = DeveloperInformation(
-    "985892345",
-    "GuoXiangrui",
-    "guo985892345@formail.com"
+    githubName = "985892345",
+    email = "guo985892345@formail.com"
   )
 
   // 其他开发者信息
@@ -29,7 +28,8 @@ abstract class Publisher(val project: Project) {
   var githubName = masterDeveloper.githubName
 
   // github 仓库名称
-  var githubRepositoryName: String = project.rootProject.name
+  var githubRepositoryName: String = ""
+    get() = field.ifEmpty { project.rootProject.name }
 
   // github 主分支
   var mainBranch: String = getGitBranchName()
@@ -38,7 +38,8 @@ abstract class Publisher(val project: Project) {
   var description: String = ""
 
   // 依赖名称
-  var artifactId: String = project.name
+  var artifactId: String = ""
+    get() = field.ifEmpty { project.name }
 
   /**
    * 依赖的域名
@@ -48,8 +49,8 @@ abstract class Publisher(val project: Project) {
    */
   var groupId: String = ""
     get() = field.ifEmpty {
-      project.group.toString().takeIf { it.isNotEmpty() }
-        ?: project.properties["GROUP"]?.toString()
+      project.group.toString().takeIf { it.isNotEmpty() && !it.startsWith(project.rootProject.name) }
+        ?: project.properties["GROUP"]?.toString()?.takeIf { it.isNotEmpty() }
         ?: "io.github.$githubName"
     }
 
@@ -60,10 +61,11 @@ abstract class Publisher(val project: Project) {
    * 2. 再从 .properties 里面找
    * 3. 还是没得就会报错
    */
-  var version: String? = null
-    get() = if (!field.isNullOrEmpty()) field else {
+  var version: String = ""
+    get() = field.ifEmpty {
       project.version.toString().takeIf { it != Project.DEFAULT_VERSION }
-        ?: project.properties["VERSION"]?.toString()
+        ?: project.properties["VERSION"]?.toString()?.takeIf { it.isNotEmpty() }
+        ?: error("未设置 version, 请在 build.gradle.kts 中设置 version 或单独设置 publisher.version")
     }
 
   // 开源协议证书

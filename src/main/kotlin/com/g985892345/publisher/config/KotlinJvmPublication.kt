@@ -14,6 +14,7 @@ import org.gradle.kotlin.dsl.get
  */
 object KotlinJvmPublication : MavenPublicationConfig {
   override fun config(project: Project) {
+    super.config(project)
     configJarTask(project)
   }
 

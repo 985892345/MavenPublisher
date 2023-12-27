@@ -29,6 +29,7 @@ import org.gradle.kotlin.dsl.get
 object GradlePluginPublication : MavenPublicationConfig {
 
   override fun config(project: Project) {
+    super.config(project)
     configJarTask(project)
   }
 

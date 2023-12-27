@@ -8,7 +8,6 @@
 - Android
 - Java
 - Kotlin/Jvm
-- Kotlin Multiplatform
 - gradle plugin
 
 ## 使用
@@ -18,10 +17,9 @@ plugins {
   id("io.github.985892345.MavenPublisher") version "x.y.z"
 }
 ```
-注意该插件需要在以下插件后引入才能判断模块类型:
+注意该插件需要在以下插件后引入，否则将无法判断模块类型:
 - com.android.library
 - com.gradle.plugin-publish
-- org.jetbrains.kotlin.multiplatform
 - org.jetbrains.kotlin.jvm
 - java
 
