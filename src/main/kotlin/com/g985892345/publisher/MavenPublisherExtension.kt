@@ -21,19 +21,6 @@ class MavenPublisherExtension : Plugin<Project> {
 
   private fun Project.config() {
     apply(plugin = "com.vanniktech.maven.publish")
-    tasks.register("publishAllPublicationsToMavenCentralRepositoryNoConfigurationCache") {
-      group = "publishing"
-      doLast {
-        val args = listOf(
-          "publishAllPublicationsToMavenCentralRepository",
-          "--no-configuration-cache"
-        )
-
-        exec {
-          commandLine("gradlew", *args.toTypedArray())
-        }
-      }
-    }
     val publisher = extensions.create("publisher", Publisher::class.java, project)
     // 使用 afterEvaluate 确保 publish 已被设置
     afterEvaluate {

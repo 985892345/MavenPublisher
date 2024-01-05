@@ -20,9 +20,11 @@ plugins {
 // build.gradle.kts 中
 publisher {
   masterDeveloper = DeveloperInformation("985892345")
-  license = "MIT"
   description = "一键发布 985892345 的开源库到 mavenCentral"
-  createGradlePlugin( // 只有 gradle 插件才需要
+  
+  // 发布 gradle 插件时可能需要引入 id("com.gradle.plugin-publish") version "1.2.1" 
+  // 详细可看: https://plugins.gradle.org/docs/publish-plugin
+  createGradlePlugin(
     name = "MavenPublisher",
     id = "io.github.985892345.MavenPublisher",
     implementationClass = "com.g985892345.publisher.MavenPublisherExtension",
@@ -41,7 +43,7 @@ publisher {
 ./gradlew publishAllPublicationsToMavenCentralRepository
 
 # 发布到 release 
-# 可以直接使用 publishAllPublicationsToMavenCentralRepositoryNoConfigurationCache 任务，已带上参数
+# 使用 publishAllPublicationsToMavenCentralRepository 也可
 ./gradlew publishAllPublicationsToMavenCentralRepository --no-configuration-cache
 ./gradlew closeAndReleaseRepository
 ```

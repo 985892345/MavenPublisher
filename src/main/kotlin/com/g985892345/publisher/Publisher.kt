@@ -62,11 +62,9 @@ abstract class Publisher(val project: Project) {
 
   // 开源协议类型
   var license: String? = null
-    get() = field?.let {
-      project.rootProject.projectDir
-        .resolve("LICENSE")
-        .let { getLicense(it) }
-    }
+    get() = field ?: project.rootProject.projectDir
+      .resolve("LICENSE")
+      .let { getLicense(it) }
 
   /**
    * gradle 插件需要单独设置

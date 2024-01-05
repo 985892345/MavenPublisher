@@ -1,10 +1,10 @@
 plugins {
   `kotlin-dsl`
-  id("io.github.985892345.MavenPublisher") version "1.1.0"
+  id("io.github.985892345.MavenPublisher") version "1.1.1-alpha01-SNAPSHOT"
 }
 
 group = "io.github.985892345"
-version = "1.1.0"
+version = "1.1.1"
 
 repositories {
   mavenLocal()
@@ -18,7 +18,6 @@ dependencies {
 }
 
 publisher {
-  license = "MIT License"
   description = "一键发布 985892345 的开源库到 mavenCentral"
   createGradlePlugin(
     name = "MavenPublisher",
