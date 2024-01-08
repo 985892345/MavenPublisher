@@ -22,8 +22,7 @@ publisher {
   masterDeveloper = DeveloperInformation("985892345")
   description = "一键发布 985892345 的开源库到 mavenCentral"
   
-  // 发布 gradle 插件时可能需要引入 id("com.gradle.plugin-publish") version "1.2.1" 
-  // 详细可看: https://plugins.gradle.org/docs/publish-plugin
+  // 用于发布 gradle 插件
   createGradlePlugin(
     name = "MavenPublisher",
     id = "io.github.985892345.MavenPublisher",
