@@ -24,6 +24,7 @@ class MavenPublisherExtension : Plugin<Project> {
     val publisher = extensions.create("publisher", Publisher::class.java, project)
     // 使用 afterEvaluate 确保 publish 已被设置
     afterEvaluate {
+      val masterDeveloper = publisher.masterDeveloper ?: error("未设置 masterDeveloper")
       extensions.configure<MavenPublishBaseExtension> {
         coordinates(publisher.groupId, publisher.artifactId, publisher.version)
         signAllPublications()
@@ -44,7 +45,7 @@ class MavenPublisherExtension : Plugin<Project> {
 
           developers {
             developer {
-              publisher.masterDeveloper.config(this)
+              masterDeveloper.config(this)
             }
             publisher.otherDevelopers.forEach {
               developer { it.config(this) }

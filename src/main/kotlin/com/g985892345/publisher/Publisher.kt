@@ -15,16 +15,16 @@ import java.io.File
 abstract class Publisher(val project: Project) {
 
   // 主开发者信息
-  var masterDeveloper = DeveloperInformation(
-    githubName = "985892345",
-    email = "guo985892345@formail.com"
-  )
+  var masterDeveloper: DeveloperInformation? = null
 
   // 其他开发者信息
   var otherDevelopers: List<DeveloperInformation> = emptyList()
 
   // 仓库所有者名字
-  var githubName = masterDeveloper.githubName
+  var githubName: String = ""
+    get() = field.ifEmpty {
+      masterDeveloper?.githubName ?: error("未设置 githubName")
+    }
 
   // github 仓库名称
   var githubRepositoryName: String = ""
@@ -60,11 +60,15 @@ abstract class Publisher(val project: Project) {
         ?: error("未设置 version, 建议在 build.properties 中设置 VERSION 字段")
     }
 
+  // 开源协议文件
+  var licenseFile: () -> File = {
+    project.rootProject.projectDir
+      .resolve("LICENSE")
+  }
+
   // 开源协议类型
   var license: String? = null
-    get() = field ?: project.rootProject.projectDir
-      .resolve("LICENSE")
-      .let { getLicense(it) }
+    get() = field ?: getLicense(licenseFile())
 
   /**
    * gradle 插件需要单独设置
