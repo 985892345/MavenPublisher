@@ -57,7 +57,9 @@ abstract class Publisher(val project: Project) {
     get() = field.ifEmpty {
       project.version.toString().takeIf { it != Project.DEFAULT_VERSION }
         ?: project.properties["VERSION"]?.toString()?.takeIf { it.isNotEmpty() }
-        ?: error("未设置 version, 建议在 build.properties 中设置 VERSION 字段")
+        ?: project.rootProject.version.toString().takeIf { it != Project.DEFAULT_VERSION }
+        ?: project.rootProject.properties["VERSION"]?.toString()?.takeIf { it.isNotEmpty() }
+        ?: error("未设置 version, 建议在 build.gradle 或者 gradle.properties 中设置 VERSION 字段")
     }
 
   // 开源协议文件
@@ -71,7 +73,7 @@ abstract class Publisher(val project: Project) {
     get() = field ?: getLicense(licenseFile())
 
   /**
-   * gradle 插件需要单独设置
+   * 还需要依赖 `java-gradle-plugin` 才能正常使用
    *
    * 请在设置 githubRepositoryName 和 description 后调用
    * @param name 生成的 gradle task 部分名称

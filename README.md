@@ -23,6 +23,7 @@ publisher {
   description = "一键发布 985892345 的开源库到 mavenCentral"
   
   // 用于发布 gradle 插件
+  // 但仍然需要你主动依赖 `java-gradle-plugin` 插件
   createGradlePlugin(
     name = "MavenPublisher",
     id = "io.github.985892345.MavenPublisher",
@@ -42,9 +43,7 @@ publisher {
 ./gradlew publishAllPublicationsToMavenCentralRepository
 
 # 发布到 release 
-# 使用 publishAllPublicationsToMavenCentralRepository 也可
-./gradlew publishAllPublicationsToMavenCentralRepository --no-configuration-cache
-./gradlew closeAndReleaseRepository
+./gradlew publishAndReleaseToMavenCentral --no-configuration-cache
 ```
 详细步骤可以查看 [com.vanniktech.maven.publish Publishing release](https://vanniktech.github.io/gradle-maven-publish-plugin/central/#publishing-releases)
 

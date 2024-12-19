@@ -1,10 +1,10 @@
 plugins {
   `kotlin-dsl`
-  id("io.github.985892345.MavenPublisher") version "1.1.1"
+  id("io.github.985892345.MavenPublisher") version "1.1.3"
 }
 
 group = "io.github.985892345"
-version = "1.1.2"
+version = "1.1.3"
 
 repositories {
   mavenLocal()
@@ -14,11 +14,17 @@ repositories {
 }
 
 dependencies {
-  implementation("com.vanniktech:gradle-maven-publish-plugin:0.29.0")
+  // https://github.com/vanniktech/gradle-maven-publish-plugin
+  // https://vanniktech.github.io/gradle-maven-publish-plugin/central/#publishing-releases
+  implementation("com.vanniktech:gradle-maven-publish-plugin:0.30.0")
 }
 
 publisher {
-  description = "一键发布 985892345 的开源库到 mavenCentral"
+  masterDeveloper = DeveloperInformation(
+    githubName = "985892345",
+    email = "guo985892345@formail.com"
+  )
+  description = "一键发布 github 开源库到 mavenCentral"
   createGradlePlugin(
     name = "MavenPublisher",
     id = "io.github.985892345.MavenPublisher",
