@@ -40,10 +40,7 @@ publisher {
 ./gradlew publishToMavenLocal
 
 # 如果 version 以 SNAPSHOT 结尾，发布到 mavenCentral 的快照仓库
-./gradlew publishAllPublicationsToMavenCentralRepository
-
-# 发布到 release 
-./gradlew publishAndReleaseToMavenCentral --no-configuration-cache
+./gradlew publishToMavenCentral
 ```
 详细步骤可以查看 [com.vanniktech.maven.publish Publishing release](https://vanniktech.github.io/gradle-maven-publish-plugin/central/#publishing-releases)
 

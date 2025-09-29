@@ -1,7 +1,6 @@
 package com.g985892345.publisher
 
 import com.vanniktech.maven.publish.MavenPublishBaseExtension
-import com.vanniktech.maven.publish.SonatypeHost
 import org.gradle.api.Plugin
 import org.gradle.api.Project
 import org.gradle.kotlin.dsl.apply
@@ -28,7 +27,7 @@ class MavenPublisherExtension : Plugin<Project> {
       extensions.configure<MavenPublishBaseExtension> {
         coordinates(publisher.groupId, publisher.artifactId, publisher.version)
         signAllPublications()
-        publishToMavenCentral(SonatypeHost.S01)
+        publishToMavenCentral(true)
         pom {
           name.set(publisher.artifactId)
           description.set(publisher.description)

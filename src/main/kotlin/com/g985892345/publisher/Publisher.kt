@@ -2,6 +2,7 @@ package com.g985892345.publisher
 
 import DeveloperInformation
 import org.gradle.api.Project
+import org.gradle.kotlin.dsl.apply
 import org.gradle.kotlin.dsl.configure
 import org.gradle.plugin.devel.GradlePluginDevelopmentExtension
 import java.io.File
@@ -31,7 +32,8 @@ abstract class Publisher(val project: Project) {
     get() = field.ifEmpty { project.rootProject.name }
 
   // github 主分支
-  var mainBranch: String = getGitBranchName()
+  var mainBranch: String = ""
+    get() = field.ifEmpty { getGitBranchName() }
 
   // 描述
   var description: String = ""
@@ -59,13 +61,26 @@ abstract class Publisher(val project: Project) {
         ?: project.properties["VERSION"]?.toString()?.takeIf { it.isNotEmpty() }
         ?: project.rootProject.version.toString().takeIf { it != Project.DEFAULT_VERSION }
         ?: project.rootProject.properties["VERSION"]?.toString()?.takeIf { it.isNotEmpty() }
-        ?: error("未设置 version, 建议在 build.gradle 或者 gradle.properties 中设置 VERSION 字段")
+        ?: project.gradle.parent?.rootProject?.version?.toString()?.takeIf { it != Project.DEFAULT_VERSION }
+        ?: project.gradle.parent?.rootProject?.properties?.get("VERSION")?.toString()?.takeIf { it.isNotEmpty() }
+        ?: error("未设置 version, 建议在 build.gradle 中设置 version 或者 gradle.properties 中设置 VERSION 字段")
     }
 
   // 开源协议文件
   var licenseFile: () -> File = {
-    project.rootProject.projectDir
-      .resolve("LICENSE")
+    // 当前项目路径下
+    val projectLicenseFile = project.projectDir.resolve("LICENSE")
+    if (projectLicenseFile.exists()) projectLicenseFile else {
+      // 根项目路径下
+      val rootProjectLicenseFile = project.rootProject.projectDir.resolve("LICENSE")
+      if (rootProjectLicenseFile.exists()) rootProjectLicenseFile else {
+        // 如果是根项目下 plugin 项目，则通过 gradle.parent.rootProject 进行查找
+        val parentGradleProjectLicenseFile = project.gradle.parent?.rootProject?.rootDir?.resolve("LICENSE")
+        if (parentGradleProjectLicenseFile?.exists() == true) parentGradleProjectLicenseFile else {
+          error("请指定 LICENSE 文件路径")
+        }
+      }
+    }
   }
 
   // 开源协议类型
@@ -89,6 +104,7 @@ abstract class Publisher(val project: Project) {
     displayName: String,
     tags: List<String>
   ) {
+    project.apply(plugin = "org.gradle.java-gradle-plugin")
     project.extensions.configure<GradlePluginDevelopmentExtension> {
       website.set("https://github.com/${githubName}/${githubRepositoryName}")
       vcsUrl.set("https://github.com/${githubName}/${githubRepositoryName}")
@@ -105,11 +121,15 @@ abstract class Publisher(val project: Project) {
   }
 
   private fun getGitBranchName(): String {
-    val process = ProcessBuilder("git", "rev-parse", "--abbrev-ref", "HEAD")
-      .directory(File(System.getProperty("user.dir")))
-      .start()
-    process.inputStream.bufferedReader().use { reader ->
-      return reader.readLine().trim()
+    runCatching {
+      val process = ProcessBuilder("git", "rev-parse", "--abbrev-ref", "HEAD")
+        .directory(File(System.getProperty("user.dir")))
+        .start()
+      process.inputStream.bufferedReader().use { reader ->
+        return reader.readLine().trim()
+      }
+    }.getOrElse {
+      throw RuntimeException("获取 git 分支名失败", it)
     }
   }
 
